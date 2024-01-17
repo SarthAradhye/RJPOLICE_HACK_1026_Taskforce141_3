@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajasthan police hackathon</title>
+    <style>
+        body{
+            margin: 0;
+        }
+        @font-face {
+            font-family: jhapak;
+            src: url('/SteinerLight-JR1o.ttf');
+        }
+        @font-face {
+            font-family: Terrorist;
+            src: url('/pricedown-bl.ttf');
+        }
+        header h1{
+            font-family: jhapak;
+            padding-left: 2%;
+        }
+        header{
+            background-image: linear-gradient(#0239fd,#ff0000,#0239fd);
+        }
+        header{
+            display: flex;
+
+        }
+        .Input{
+            font-family: Terrorist;
+            text-align: center;
+            margin-left: 45%;
+            display: inline-block;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        input{
+            margin-left: 40%;
+            border: #0239fd solid;
+            
+        }
+        #inputImage{
+            padding-left: 30%;
+            max-width: 100%;
+            margin-top: 20px;
+        }
+        p{
+            padding-left: 45%;
+        }
+    </style>
+</head>
+<body>
+    <header><img src="/Rajasthan-Police-removebg-preview.png" alt="" width="100"><h1>Rajasthan Police Hackathon Team: Taskforce 141</h1>
+    </header>
+    <nav>
+        <a href="weapons.html"> See our camera feature</a>
+    </nav>
+    <h2 class="Input" for="imageInput"> Select image</h2>
+    <input type="file" id="imageInput" accept="image/*" onchange="handleImageChange()">
+
+    <!-- Display the selected image -->
+    <img id="inputImage" src="#" alt="">
+
+    <!-- Audio element for playing sound -->
+    
+
+    <p id="prediction"></p>
+
+    <!-- TensorFlow.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+    <!-- Load your Teachable Machine model -->
+    <script>
+        async function loadModel() {
+            const model = await tf.loadLayersModel('model2.json');
+            return model;
+        }
+
+        async function predict(image) {
+            const model = await loadModel();
+
+            // Preprocess the image
+            const tensor = tf.browser.fromPixels(image)
+                .resizeNearestNeighbor([224, 224]) // Adjust dimensions based on your model
+                .toFloat()
+                .expandDims();
+
+            // Make a prediction
+            const prediction = await model.predict(tensor).data();
+
+            // Display the prediction
+            const classNames = ['Fight', 'Fight', 'Fight', 'Fight', 'Fight'];
+            const maxIndex = prediction.indexOf(Math.max(...prediction));
+            const result = classNames[maxIndex];
+
+            document.getElementById('prediction').innerText = `Prediction: ${result}`;
+            const message =" has been found in your area"
+
+            alert(result + message)
+        }
+
+
+        // Handle image change when the user selects a new image
+        function handleImageChange() {
+            const input = document.getElementById('imageInput');
+            const image = document.getElementById('inputImage');
+
+            // Get the selected file
+            const file = input.files[0];
+
+            // Display the selected image
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    image.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                // Call predict function with the selected image
+                predict(image);
+            }
+        }
+
+        // Initial call to predict with a default image (optional)
+        // predict(document.getElementById('inputImage'));
+    </script>
+    
+</body>
+</html>
